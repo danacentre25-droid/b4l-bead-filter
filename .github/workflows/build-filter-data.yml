@@ -1,0 +1,30 @@
+name: Build filter data
+
+on:
+  schedule:
+    - cron: '0 19 * * *'   # every day 03:00 Hong Kong time
+  workflow_dispatch:        # "Run workflow" button for a manual update
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Build JSON files
+        run: node build-index.mjs
+        env:
+          BC_STORE_HASH: ${{ secrets.BC_STORE_HASH }}
+          BC_TOKEN: ${{ secrets.BC_TOKEN }}
+      - name: Save to repository
+        run: |
+          git config user.name "filter-bot"
+          git config user.email "filter-bot@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet || git commit -m "Update filter data"
+          git push

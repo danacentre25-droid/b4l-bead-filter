@@ -1,0 +1,9 @@
+{
+  "name": "b4l-bead-filter",
+  "version": "1.0.0",
+  "description": "Static JSON data pipeline for B4L (Bead For Less) BigCommerce Refine filter bar",
+  "type": "module",
+  "scripts": {
+    "build": "node build-index.mjs"
+  }
+}
