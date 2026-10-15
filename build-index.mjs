@@ -184,9 +184,13 @@ async function main() {
   console.log('Fetching visible products with custom fields and images...');
   const products = await getAll(
     '/catalog/products?is_visible=true&include=custom_fields,primary_image' +
-    '&include_fields=id,name,price,categories,custom_url,order_quantity_minimum'
+    '&include_fields=id,name,price,categories,custom_url,order_quantity_minimum,sort_order'
   );
   console.log(`Retrieved ${products.length} products.`);
+
+  // Sort products by BigCommerce sort_order ascending so that products within every category
+  // match BigCommerce native category featured item ordering by default!
+  products.sort((a, b) => (a.sort_order ?? 999999) - (b.sort_order ?? 999999) || a.id - b.id);
 
   let skuStone = {};
   try {

@@ -1,0 +1,844 @@
+<script>
+(function () {
+  'use strict';
+
+  var style = document.createElement('style');
+  style.textContent = `
+.bhk-rf{--navy:#1F3A78;--navy-d:#16264D;--navy-t:#EAF0FA;--gold:#D6A650;--gold-d:#8A6420;--gold-t:#FBF3E3;--green:#1E7A57;--green-t:#E6F3EE;--line:#E2E7F1;--muted:#5A6378;--text:#1B2233;
+  display:flex;gap:28px;align-items:flex-start;margin:16px 0 40px;font-family:'Plus Jakarta Sans','Helvetica Neue',Arial,sans-serif;color:var(--text);font-size:15px;line-height:1.45}
+.bhk-rf *{box-sizing:border-box}
+.bhk-rf button{font:inherit;cursor:pointer}
+:where(.bhk-rf) button{color:inherit}
+.bhk-rf__side{width:272px;flex-shrink:0;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;max-height:calc(100vh - 200px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;align-self:flex-start;z-index:10;position:relative;box-sizing:border-box}
+.bhk-rf__side::-webkit-scrollbar{width:6px}
+.bhk-rf__side::-webkit-scrollbar-track{background:transparent}
+.bhk-rf__side::-webkit-scrollbar-thumb{background:#C9D2E4;border-radius:3px}
+.bhk-rf__side::-webkit-scrollbar-thumb:hover{background:#9AA5BD}
+.bhk-rf__head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.bhk-rf__title{font-size:18px;font-weight:800;color:var(--navy-d);display:flex;gap:8px;align-items:center}
+.bhk-rf__clear{background:none;border:0;padding:6px;color:var(--gold-d);font-weight:700;font-size:13px;text-decoration:underline}
+.bhk-rf__close{display:none}
+.bhk-g{border-top:1px solid var(--line);padding:8px 0}
+.bhk-g:first-of-type{border-top:0}
+.bhk-g__btn{width:100%;display:flex;justify-content:space-between;align-items:center;background:none;border:0;padding:2px 0;font-weight:800;font-size:12.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-d)}
+.bhk-g__btn svg{transition:transform .15s}
+.bhk-g.is-closed .bhk-g__btn svg{transform:rotate(-90deg)}
+.bhk-g.is-closed .bhk-g__body{display:none}
+.bhk-g__body{padding-top:4px}
+.bhk-pills{display:flex;flex-wrap:wrap;gap:6px}
+.bhk-pill{min-width:48px;height:32px;padding:0 10px;border-radius:8px;border:1.5px solid #C9D2E4;background:#fff;font-weight:700;font-size:13px}
+.bhk-pill[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.bhk-opt{display:flex;align-items:center;gap:8px;padding:3.5px 6px;border-radius:6px;cursor:pointer;font-size:13.5px;line-height:1.25;width:100%;background:none;border:0;text-align:left}
+.bhk-opt:hover{background:var(--navy-t)}
+.bhk-cb{width:16px;height:16px;border:1.5px solid #9AA5BD;border-radius:4px;background:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.bhk-cb svg{visibility:hidden;width:10px;height:10px}
+.bhk-opt[aria-checked="true"]{background:var(--navy-t);font-weight:700;color:var(--navy)}
+.bhk-opt[aria-checked="true"] .bhk-cb{background:var(--navy);border-color:var(--navy)}
+.bhk-opt[aria-checked="true"] .bhk-cb svg{visibility:visible}
+.bhk-opt__n{margin-left:auto;font-size:11.5px;font-weight:700;color:var(--muted);background:#F5F7FB;border-radius:8px;padding:1px 6px}
+.bhk-g[data-g="stone"] .bhk-opt__n{display:none !important}
+.bhk-sw{width:16px;height:16px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.bhk-opt[aria-checked="true"] .bhk-sw{box-shadow:0 0 0 1.5px #fff,0 0 0 3px var(--navy)}
+.bhk-more{background:none;border:0;padding:4px 6px;color:var(--navy);font-weight:700;font-size:12.5px}
+.bhk-rf__main{flex:1;min-width:0}
+.bhk-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.bhk-count{font-weight:800;color:var(--navy-d);font-size:16px;margin-right:4px}
+.bhk-chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px 0 12px;border-radius:16px;border:0;background:var(--navy-t);color:var(--navy);font-weight:700;font-size:13px}
+.bhk-sort{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.bhk-sort select{height:40px;border:1px solid #C9D2E4;border-radius:10px;padding:0 10px;font:inherit;color:var(--text);background:#fff}
+.bhk-fbtn{display:none;height:42px;padding:0 16px;border-radius:10px;border:1.5px solid var(--navy);background:#fff;color:var(--navy);font-weight:800;align-items:center;gap:8px}
+.bhk-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+
+/* ============================================================
+   B4L CARD DESIGN WITH 3-TIER PRICING, QUICK VIEW & STEPPER
+============================================================ */
+.bcard{display:flex;flex-direction:column;position:relative;width:100%;height:100%;
+  box-sizing:border-box;background:#fff;border:1px solid #e3e7f0;border-radius:12px;
+  padding:16px;margin:0;text-align:left;transition:box-shadow .2s ease}
+.bcard:hover{box-shadow:0 8px 24px rgba(27,42,94,.12)}
+.bcard-figure{position:relative !important;display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;width:100% !important;margin:0 auto 10px !important;padding:0 !important;text-align:center !important;overflow:visible !important}
+.bcard-figure__link{display:flex !important;align-items:center !important;justify-content:center !important;width:100% !important;margin:0 auto !important;text-align:center !important;text-decoration:none !important}
+.bcard-imgWrap{display:flex !important;align-items:center !important;justify-content:center !important;width:100% !important;height:auto !important;min-height:0 !important;max-height:none !important;margin:0 auto !important;text-align:center !important;position:relative !important;overflow:visible !important;transition:opacity .2s ease !important}
+.bcard-imgWrap .bcard-image,
+.bcard-figure .bcard-image,
+.bcard-image{display:block !important;margin:0 auto !important;max-width:100% !important;height:auto !important;max-height:none !important;min-height:0 !important;object-fit:contain !important;float:none !important}
+.bcard-figure:hover .bcard-imgWrap{opacity:0.6 !important}
+
+/* Quick View Button */
+.bcard-btn.quickview,
+.bcard-figure .quickview{
+  position:absolute !important;inset:0 !important;margin:auto !important;
+  width:max-content !important;height:max-content !important;flex:none !important;
+  transform:translateY(8px) !important;z-index:10 !important;opacity:0 !important;
+  pointer-events:none !important;transition:opacity 0.2s ease,transform 0.2s ease !important;
+  white-space:nowrap !important;background:#fff !important;color:#1a1a2e !important;
+  border:2px solid #1a1a2e !important;border-radius:4px !important;padding:8px 18px !important;
+  font-size:0.78rem !important;font-weight:700 !important;letter-spacing:0.08em !important;
+  text-transform:uppercase !important;cursor:pointer !important;text-decoration:none !important;
+  display:flex !important;align-items:center !important;justify-content:center !important;
+  text-align:center !important;line-height:normal !important;
+}
+.bcard-figure:hover .quickview{opacity:1 !important;pointer-events:auto !important;transform:translateY(0) !important}
+
+.bcard-body{display:flex;flex-direction:column;flex:1 1 auto;width:100%;margin:0;padding:0;text-align:left}
+.bcard-title{margin:0 0 10px;padding:0;font-size:14.5px;font-family:'Roboto',sans-serif;line-height:1.4;
+  font-weight:500 !important;text-align:left;height:42px;overflow:hidden}
+.bcard-title a{color:#000 !important;text-decoration:none}
+.bcard-title a:hover{color:#e8174b}
+
+/* 3-Tier Pricing Table (US$3,000+ / US$6,000+ / US$20,000+) */
+.bcard-priceTable{width:100%;margin:4px 0 12px;border-collapse:separate;border-spacing:0;
+  border:1px solid #dcdfe6;border-radius:6px;overflow:hidden;font-family:inherit}
+.bcard-priceTable th{background-color:#1F3A78;color:#ffffff;font-size:14px;font-weight:700;
+  text-align:center;padding:7px 8px;line-height:1.35;border:none;width:50%}
+.bcard-priceTable th:not(:last-child){border-right:1px solid rgba(255,255,255,0.4)}
+.bcard-priceTable td{padding:7px 8px;text-align:center;font-size:14px;font-weight:500;
+  color:#000000;line-height:1.35;background-color:#ffffff;border:none;border-top:1px solid #dcdfe6;
+  width:50%;font-variant-numeric:tabular-nums}
+.bcard-priceTable td:not(:last-child){border-right:1px solid #dcdfe6}
+.bcard-priceTable .bcard-priceValue{font-weight:500;color:#000000;font-size:14px}
+
+/* Quantity Stepper & Add to Cart */
+.bcard-qtyCart{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;margin-top:auto;padding-top:8px}
+.bcard-qty__label{flex:0 0 auto;font-size:13px;color:#555;white-space:nowrap}
+.bcard-stepper{display:inline-flex;align-items:stretch;height:38px}
+.bcard-stepper__btn{width:28px;height:38px;border:1px solid #dcdfe6;background:#fff;
+  color:#1F3A78;font-size:16px;line-height:1;cursor:pointer;padding:0;margin:0;display:inline-flex;
+  align-items:center;justify-content:center;transition:background .15s ease}
+.bcard-stepper__btn:first-child{border-radius:6px 0 0 6px}
+.bcard-stepper__btn:last-child{border-radius:0 6px 6px 0}
+.bcard-stepper__btn:hover{background:#f3f5fa}
+.bcard-stepper__input{width:44px;height:38px;border:1px solid #dcdfe6;border-left:0;border-right:0;
+  border-radius:0;text-align:center;font-size:15px;font-weight:700;color:#1F3A78;padding:0;margin:0;background:#fff}
+.bcard-qtyCart .bcard-add{flex:1 1 auto !important;min-width:60px !important;
+  height:38px !important;margin:0 !important;padding:0 !important;display:inline-flex !important;
+  align-items:center !important;justify-content:center !important;background-color:#1F3A78 !important;
+  border:1px solid #1F3A78 !important;border-radius:6px !important;cursor:pointer !important;
+  font-size:0 !important;line-height:0 !important;color:transparent !important;position:relative !important;
+  overflow:hidden !important;transition:background-color .15s ease !important}
+.bcard-qtyCart .bcard-add:hover{background-color:#172c5c !important;border-color:#172c5c !important}
+.bcard-qtyCart .bcard-add::after{content:'' !important;display:block !important;width:24px !important;height:24px !important;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none' stroke='%23ffffff' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h4l3 12.5h11.5l2-6H8.5'/%3E%3Cpath d='M7.8 11.5h14.2'/%3E%3Ccircle cx='23' cy='8.5' r='5.2' stroke='%23ffffff' stroke-width='2.3'/%3E%3Cpath d='M23 6.2v4.6M20.7 8.5h4.6' stroke-width='2.3'/%3E%3Ccircle cx='12' cy='24.5' r='2.2' stroke-width='2.3'/%3E%3Ccircle cx='21' cy='24.5' r='2.2' stroke-width='2.3'/%3E%3C/svg%3E") center / contain no-repeat !important;
+  pointer-events:none !important}
+.bcard-qtyCart .bcard-add[data-busy="1"]{font-size:11px !important;line-height:normal !important;color:#ffffff !important;
+  width:auto !important;min-width:68px !important;max-width:none !important;padding:0 8px !important}
+.bcard-qtyCart .bcard-add[data-busy="1"]::after{display:none !important}
+
+/* End of List & Sentinel UI */
+.bhk-end-of-list{margin:36px auto 20px;text-align:center;padding:24px 16px;border-top:1px dashed #C9D2E4;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+.bhk-end-of-list__txt{font-size:14px;font-weight:700;color:var(--muted);letter-spacing:0.3px}
+.bhk-back-to-top{display:inline-flex;align-items:center;justify-content:center;height:38px;padding:0 20px;border-radius:20px;background:var(--navy);color:#fff;border:0;font-size:13px;font-weight:700;cursor:pointer;transition:background-color .15s}
+.bhk-back-to-top:hover{background:var(--navy-d)}
+.bhk-sentinel{height:60px;margin:20px 0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;font-weight:600}
+.bhk-sentinel__loading{display:inline-flex;align-items:center;gap:8px}
+.bhk-sentinel__loading::before{content:'';width:16px;height:16px;border:2px solid #C9D2E4;border-top-color:var(--navy);border-radius:50%;animation:bhk-spin .6s linear infinite}
+@keyframes bhk-spin{to{transform:rotate(360deg)}}
+
+.bhk-sheetfoot{display:none}
+.bhk-listlink{display:flex;align-items:center;justify-content:center;gap:10px;margin:18px 0;padding:14px 20px;background:var(--navy);color:#fff;font-weight:800;border-radius:12px;text-decoration:none}
+.bhk-empty{padding:48px 20px;text-align:center;color:var(--muted);font-weight:600}
+
+@media (max-width:1100px){.bhk-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:900px){
+  .bhk-rf{display:block;margin:12px 0 30px}
+  .bhk-fbtn{display:inline-flex}
+  .bhk-sort{margin-left:auto}
+  .bhk-rf__side{position:fixed;inset:0;width:100%;max-height:none;height:100%;border-radius:0;border:0;z-index:99999;display:none;padding:20px;background:#fff;flex-direction:column}
+  .bhk-rf.is-open .bhk-rf__side{display:flex}
+  .bhk-rf__close{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#F3F5FA;border:0}
+  .bhk-sheetfoot{display:block;position:sticky;bottom:0;background:#fff;padding:12px 0 0;border-top:1px solid var(--line);margin-top:auto}
+  .bhk-sheetfoot button{width:100%;height:46px;background:var(--navy);color:#fff;border:0;border-radius:12px;font-weight:800;font-size:15px}
+  .bhk-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .bcard-priceTable th,
+  .bcard-priceTable td,
+  .bcard-priceTable .bcard-priceValue{font-size:12.5px;padding:4px 6px}
+  .bhk-pill{height:34px;min-height:34px}
+  .bhk-opt{min-height:30px}
+}
+@media (max-width:480px){
+  .bhk-grid{grid-template-columns:1fr}
+}
+`;
+  document.head.appendChild(style);
+
+  /* ===== Settings ===== */
+  var CONFIG = {
+    DATA_URL: 'https://danacentre25-droid.github.io/b4l-bead-filter/',
+    LISTING: '#product-listing-container',
+    HIDE: ['#product-listing-container', '.pagination', '.actionBar'],
+    MIN_PRODUCTS: 1,
+    PAGE_SIZE: 48,
+    TEST_ONLY: false
+  };
+
+  var STONES_96 = [
+    '7 Chakra', 'Agate', 'Amazonite', 'Amber Horn', 'Amethyst', 'Apatite',
+    'Aquamarine', 'Aventurine', 'Azurite', 'Banded Agate', 'Black Agate',
+    'Blood Agate', 'Bone', 'Boulder opal', 'Bronzite', 'Brown Snowflake',
+    'Buffalo Horn', 'Calcite', 'Carnelian', 'Chalcedony', 'Charoite',
+    'Cherry Quartz', 'Chrysanthemum', 'Chrysprase', 'Citrine', 'Coral',
+    'Crazy Lace Agate', 'Crystal Natural', 'Crystal Synthetic',
+    'Dalmatian Jasper', 'Denim Lapis', 'Druzy Agate', 'Epidot', 'Fire Agate',
+    'Fluorite', 'Fossil Agate', 'Fossil Jasper', 'Freshwater Pearl', 'Garnet',
+    'Glass Crystal', 'Golden Obsidian', 'Goldstone', 'Green Turquoise',
+    'Hematite', 'Howlite', 'Jade dyed', 'Jade Natural', 'Jasper', 'Kiwi Agate',
+    'Labradorite', 'Lapis Lazuli', 'Larimar', 'Lava', 'Lemon Agate',
+    'Leopard Skin', 'Lepidolite', 'Magnesite', 'Mahogany Obsidian',
+    'Malachite', 'Mix', 'Mookaite', 'Moss Agate', 'Mother Of Pearl',
+    'Nephrite Jade', 'Onyx', 'Opalite', 'Other Stones', 'Petrified Wood',
+    'Picasso Agate', 'Picture Jasper', 'Poppy Jasper', 'Quartz',
+    'Red Aventurine', 'Red Creek Jasper', 'Red Jasper', 'Rhodonite',
+    'River Fossil', 'Ruby Zoisite', 'Rutilated', 'Sea Sediment', 'Serpentine',
+    'Sesame Agate', 'Smoky Topaz', 'Snow Quartz', 'Snowflake Obsidian',
+    'Sodalite', 'Sunstone', 'Tiger Eye', 'Topaz Synthetic', 'Tourmaline',
+    'Turquoise', 'Unakite', 'White Obsidian', 'White Turquoise',
+    'Yellow Chalcedony', 'Zebra Agate'
+  ];
+
+  var GROUPS = [
+    { key: 'stone', label: 'Stone Name', col: 14, type: 'check', open: true,
+      order: STONES_96 },
+    { key: 'size', label: 'Size', col: 5, type: 'pill', open: true,
+      order: ['2mm', '3mm', '4mm', '6mm', '8mm', '10mm', '12mm', '14mm', '15mm', '16mm', '18mm', '20mm', '25mm', '30mm', '35mm', '40mm', '45mm', '50mm'] },
+    { key: 'shape', label: 'Shape', col: 6, type: 'check', open: true,
+      order: ['Round', 'Round Bead', 'Rondelle', 'Oval', 'Rice', 'Tube', 'Cube', 'Coin', 'Heart', 'Teardrop', 'Nugget', 'Chip', 'Chips', 'Bicone', 'Donut', 'Round Faceted', 'Rondelle Faceted', 'Polygon', 'Pear', 'Carved', 'Bracelet', 'Heishi', 'Rectangle', 'Square', 'Hexagon', 'Animal', 'Plant', 'Symbol', 'Earring', 'Ring', 'Rope', 'Mix Shape', 'Clasp', 'Pendant'] },
+    { key: 'color', label: 'Color', col: 7, type: 'swatch', open: true,
+      order: ['Amethyst', 'Black', 'Blue', 'Brown', 'Clear', 'Crystal', 'Green', 'Grey', 'Mix', 'Multi Color', 'Multicolor', 'Orange', 'Pink', 'Purple', 'Red', 'Turquoise', 'White', 'Yellow'] },
+    { key: 'gemstone', label: 'Treatment', col: 8, type: 'check', open: true,
+      order: ['Natural', '100% Natural', 'Natural Dyed', 'Heated', 'Dyed', 'Stabilized', 'Synthetic', 'Reconstructed', 'Man Made'] },
+    { key: 'material', label: 'Material', col: 9, type: 'check', open: true,
+      order: ['Amber Horn', 'Bone', 'Buffalo Bone', 'Buffalo Horn', 'Crystal Glass', 'Finding', 'Gemstone', 'Gemstone Matte', 'Glass Crystal', 'Metal', 'Pearl'] }
+  ];
+
+  var SWATCH = {
+    Red: '#B3322C', Pink: '#E3A6AE', Orange: '#D9772B', Yellow: '#E2BE3E', Green: '#4E8A5E', Blue: '#2F5DA8',
+    Purple: '#7B5EA7', Brown: '#8A5A2B', Black: '#222222', White: '#F4F2EC', Grey: '#9AA0A6', Clear: '#FFFFFF',
+    Turquoise: '#3BB4B4', Amethyst: '#926AA6', Crystal: '#E8F1F5',
+    Multicolor: 'conic-gradient(#B3322C,#E2BE3E,#4E8A5E,#2F5DA8,#7B5EA7,#B3322C)',
+    'Multi Color': 'conic-gradient(#B3322C,#E2BE3E,#4E8A5E,#2F5DA8,#7B5EA7,#B3322C)',
+    Mix: 'conic-gradient(#B3322C,#E2BE3E,#4E8A5E,#2F5DA8,#7B5EA7,#B3322C)'
+  };
+  var MAX_VISIBLE = 7;
+
+  var ICON_FILTER = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>';
+  var ICON_CHEV = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  var ICON_X = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+  var ICON_CHECK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg>';
+  var ICON_ARROW = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+  var items = [], state = {}, closed = {}, expanded = {}, shown = CONFIG.PAGE_SIZE, sortBy = 'default', root, isLanding = false;
+  var currentFilteredList = [], scrollObserver = null, updateStickySidebar = null;
+
+  /* ----- Helpers ----- */
+  function getJSON(url) {
+    return fetch(url).then(function (r) {
+      if (!r.ok) throw new Error(r.status + ' ' + url);
+      return r.json();
+    });
+  }
+  function normPath(p) {
+    return '/' + String(p || '').trim().replace(/^https?:\/\/[^/]+/i, '').replace(/[?#].*$/, '').replace(/^\/+|\/+$/g, '').toLowerCase();
+  }
+  function esc(s) {
+    return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ----- URL state ----- */
+  function readState() {
+    var q = new URLSearchParams(location.search);
+    GROUPS.forEach(function (g) {
+      var v = q.get(g.key);
+      state[g.key] = v ? v.split(',').filter(Boolean) : [];
+    });
+    sortBy = q.get('sort') || 'default';
+  }
+  function writeState() {
+    var q = new URLSearchParams(location.search);
+    GROUPS.forEach(function (g) {
+      if (state[g.key].length) q.set(g.key, state[g.key].join(','));
+      else q.delete(g.key);
+    });
+    if (sortBy !== 'default') q.set('sort', sortBy); else q.delete('sort');
+    var s = q.toString();
+    var url = location.pathname + (s ? '?' + s : '');
+    history.replaceState(null, '', url);
+  }
+
+  /* ----- Filtering logic ----- */
+  function match(p, skipKey) {
+    for (var i = 0; i < GROUPS.length; i++) {
+      var g = GROUPS[i];
+      if (g.key === skipKey) continue;
+      var sel = state[g.key];
+      if (!sel.length) continue;
+      var v = p[g.col];
+      if (Array.isArray(v)) {
+        var any = false;
+        for (var k = 0; k < v.length; k++) if (sel.indexOf(v[k]) >= 0) { any = true; break; }
+        if (!any) return false;
+      } else {
+        if (sel.indexOf(v) < 0) return false;
+      }
+    }
+    return true;
+  }
+
+  function countsFor(g) {
+    var counts = {};
+    for (var i = 0; i < items.length; i++) {
+      var p = items[i];
+      if (!match(p, g.key)) continue;
+      var v = p[g.col];
+      if (Array.isArray(v)) {
+        for (var k = 0; k < v.length; k++) counts[v[k]] = (counts[v[k]] || 0) + 1;
+      } else if (v) {
+        counts[v] = (counts[v] || 0) + 1;
+      }
+    }
+    return counts;
+  }
+
+  /* ----- Preserve Initial Featured Product Order Across Pages ----- */
+  var originalOrderMap = {};
+  var originalOrderCounter = 0;
+  function recordOriginalOrder(container) {
+    if (!container) return;
+    var els = container.querySelectorAll('[data-product-id], [data-entity-id], li.product, article.card, .productCard');
+    els.forEach(function (el) {
+      var id = el.getAttribute('data-product-id') || el.getAttribute('data-entity-id');
+      if (!id) {
+        var link = el.querySelector('a[href*="/"]');
+        if (link && link.href) {
+          var m = link.href.match(/\/(\d+)\/?$/);
+          if (m) id = m[1];
+        }
+      }
+      if (id) {
+        var numId = Number(id);
+        if (originalOrderMap[numId] === undefined) {
+          originalOrderMap[numId] = originalOrderCounter++;
+        }
+      }
+    });
+  }
+
+  function fetchSubsequentPages(nextUrl) {
+    if (!nextUrl) return;
+    fetch(nextUrl)
+      .then(function (r) { return r.text(); })
+      .then(function (html) {
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(html, 'text/html');
+        var container = doc.querySelector(CONFIG.LISTING);
+        if (container) recordOriginalOrder(container);
+        var nextLink = doc.querySelector('.pagination-item--next a, .pagination-next a, [data-pagination-next]');
+        if (nextLink && nextLink.href && nextLink.href !== nextUrl) {
+          fetchSubsequentPages(nextLink.href);
+        } else if (sortBy === 'default') {
+          render();
+        }
+      })
+      .catch(function () {});
+  }
+
+  function sizeNum(v) { return parseFloat(v) || 999; }
+  function sorted(list) {
+    var l = list.slice();
+    if (sortBy === 'size') {
+      l.sort(function (a, b) { return sizeNum(a[5]) - sizeNum(b[5]); });
+    } else if (sortBy === 'price') {
+      l.sort(function (a, b) { return a[4] - b[4]; });
+    } else if (sortBy === 'name') {
+      l.sort(function (a, b) { return String(a[1]).localeCompare(String(b[1])); });
+    } else {
+      // Default (Featured): preserve original category product sorting
+      l.sort(function (a, b) {
+        var rankA = originalOrderMap[a[0]] !== undefined ? originalOrderMap[a[0]] : 999999;
+        var rankB = originalOrderMap[b[0]] !== undefined ? originalOrderMap[b[0]] : 999999;
+        return rankA - rankB;
+      });
+    }
+    return l;
+  }
+
+  function selectedCount() {
+    return GROUPS.reduce(function (n, g) { return n + state[g.key].length; }, 0);
+  }
+
+  /* ----- Rendering Sidebar Drawer ----- */
+  function renderGroup(g) {
+    var counts = countsFor(g);
+    var selected = state[g.key];
+    var keys = Object.keys(counts);
+    var values;
+    if (g.order) {
+      values = g.order.filter(function (v) { return counts[v] || selected.indexOf(v) >= 0; });
+      keys.forEach(function (k) { if (values.indexOf(k) < 0) values.push(k); });
+    } else {
+      values = keys.sort();
+    }
+    if (!values.length) return '';
+
+    var isClosed = closed[g.key] !== undefined ? closed[g.key] : (!g.open && !selected.length);
+    var isExpanded = !!expanded[g.key];
+    var visible = isExpanded ? values : values.slice(0, MAX_VISIBLE);
+    var hasMore = values.length > MAX_VISIBLE;
+
+    var out = '<div class="bhk-g' + (isClosed ? ' is-closed' : '') + '" data-g="' + g.key + '">' +
+      '<button type="button" class="bhk-g__btn" data-act="toggle" data-g="' + g.key + '">' +
+      esc(g.label) + (state[g.key].length ? ' (' + state[g.key].length + ')' : '') + ICON_CHEV + '</button><div class="bhk-g__body">';
+
+    if (g.type === 'pill') {
+      out += '<div class="bhk-pills">';
+      visible.forEach(function (v) {
+        var on = selected.indexOf(v) >= 0;
+        out += '<button type="button" class="bhk-pill" data-act="pick" data-g="' + g.key + '" data-v="' + esc(v) +
+          '" aria-pressed="' + (on ? 'true' : 'false') + '">' + esc(v) + '</button>';
+      });
+      out += '</div>';
+    } else {
+      visible.forEach(function (v) {
+        var on = selected.indexOf(v) >= 0;
+        var c = counts[v] || 0;
+        out += '<button type="button" class="bhk-opt" data-act="pick" data-g="' + g.key + '" data-v="' + esc(v) +
+          '" aria-checked="' + (on ? 'true' : 'false') + '">';
+        if (g.type === 'swatch') {
+          var bg = SWATCH[v] || '#ccc';
+          out += '<span class="bhk-sw" style="background:' + bg + '"></span>';
+        } else {
+          out += '<span class="bhk-cb">' + ICON_CHECK + '</span>';
+        }
+        out += '<span>' + esc(v) + '</span><span class="bhk-opt__n">' + c + '</span></button>';
+      });
+    }
+
+    if (hasMore) {
+      out += '<button type="button" class="bhk-more" data-act="' + (isExpanded ? 'less' : 'more') + '" data-g="' + g.key + '">' +
+        (isExpanded ? 'Show less' : '+ ' + (values.length - MAX_VISIBLE) + ' more') + '</button>';
+    }
+    return out + '</div></div>';
+  }
+
+  function renderSide() {
+    var n = selectedCount();
+    var h = '<div class="bhk-rf__head"><span class="bhk-rf__title">' + ICON_FILTER + 'Refine' +
+      (n ? ' (' + n + ')' : '') + '</span>' +
+      (n ? '<button type="button" class="bhk-rf__clear" data-act="clear">Clear all</button>' : '') +
+      '<button type="button" class="bhk-rf__close" data-act="close" aria-label="Close">' + ICON_X + '</button></div>';
+    return h + GROUPS.map(renderGroup).join('');
+  }
+
+  /* ----- Rendering Card Design Matching B4L ----- */
+  function formatPriceCell(val, defaultVal) {
+    var v = val ? String(val).trim() : '';
+    if (!v && defaultVal) v = 'US$' + Number(defaultVal).toFixed(2);
+    if (!v) return '-';
+    if (/^[0-9.]+$/.test(v)) return 'US$' + Number(v).toFixed(2);
+    return v;
+  }
+
+  function card(p) {
+    var href = /[?&]rftest=1/.test(location.search) ? p[2] + (p[2].indexOf('?') < 0 ? '?' : '&') + 'rftest=1' : p[2];
+    var minQty = p[13] || (/bracelet/i.test(p[1]) ? 30 : 1);
+    var priceA = formatPriceCell(p[10], p[4]);
+    var priceB = formatPriceCell(p[11], p[4] ? p[4] * 0.93 : null);
+    var priceC = formatPriceCell(p[12], p[4] ? p[4] * 0.80 : null);
+
+    return '<article class="bcard" data-entity-id="' + p[0] + '">' +
+      '<figure class="bcard-figure">' +
+      '<a href="' + esc(href) + '" class="bcard-figure__link">' +
+      '<div class="bcard-imgWrap">' + (p[3] ? '<img class="bcard-image" src="' + esc(p[3]) + '" alt="' + esc(p[1]) + '" loading="lazy">' : '') + '</div>' +
+      '</a>' +
+      '<a class="bcard-btn quickview" data-product-id="' + p[0] + '" data-event-type="product-click" href="javascript:void(0)">Quick view</a>' +
+      '</figure>' +
+      '<div class="bcard-body">' +
+      '<h4 class="bcard-title"><a href="' + esc(href) + '">' + esc(p[1]) + '</a></h4>' +
+      '<table class="bcard-priceTable" data-test-info-type="price">' +
+      '<thead><tr><th>Order Total</th><th>Price</th></tr></thead>' +
+      '<tbody>' +
+      '<tr><td class="qv-table-amount notranslate" translate="no">US$3,000+</td><td class="bcard-priceValue qv-price-a notranslate" translate="no">' + esc(priceA) + '</td></tr>' +
+      '<tr><td class="qv-table-amount notranslate" translate="no">US$6,000+</td><td class="bcard-priceValue qv-price-b notranslate" translate="no">' + esc(priceB) + '</td></tr>' +
+      '<tr><td class="qv-table-amount notranslate" translate="no">US$20,000+</td><td class="bcard-priceValue qv-price-c notranslate" translate="no">' + esc(priceC) + '</td></tr>' +
+      '</tbody></table>' +
+      '<div class="bcard-qtyCart">' +
+      '<span class="bcard-qty__label">Quantity:</span>' +
+      '<div class="bcard-stepper" data-card-stepper>' +
+      '<button type="button" class="bcard-stepper__btn" data-step="down" aria-label="Decrease quantity">&minus;</button>' +
+      '<input type="text" class="bcard-stepper__input" data-card-qty value="' + minQty + '" inputmode="numeric" pattern="[0-9]*" aria-label="Quantity">' +
+      '<button type="button" class="bcard-stepper__btn" data-step="up" aria-label="Increase quantity">+</button>' +
+      '</div>' +
+      '<button type="button" class="bcard-btn bcard-btn--solid bcard-add notranslate" data-product-id="' + p[0] + '" data-wait-message="Adding..." aria-label="Add to Cart"></button>' +
+      '</div></div></article>';
+  }
+
+  function render() {
+    currentFilteredList = sorted(items.filter(function (p) { return match(p, null); }));
+    var list = currentFilteredList;
+    var chips = '';
+    GROUPS.forEach(function (g) {
+      state[g.key].forEach(function (v) {
+        chips += '<button type="button" class="bhk-chip" data-act="pick" data-g="' + g.key + '" data-v="' + esc(v) +
+          '" aria-label="Remove ' + esc(v) + '">' + esc(v) + ICON_X + '</button>';
+      });
+    });
+    var n = selectedCount();
+    try {
+      var picked = [];
+      GROUPS.forEach(function (g) { picked = picked.concat(state[g.key]); });
+      var storageData = JSON.stringify({ path: location.pathname, search: location.search, label: picked.join(', ') });
+      sessionStorage.setItem('b4lList', storageData);
+      sessionStorage.setItem('bhkList', storageData);
+    } catch (e) {}
+
+    var main = '<div class="bhk-bar">' +
+      '<button type="button" class="bhk-fbtn" data-act="open">' + ICON_FILTER + 'Filter' + (n ? ' (' + n + ')' : '') + '</button>' +
+      chips +
+      '<label class="bhk-sort">Sort<select data-act="sort">' +
+      [['default', 'Featured'], ['size', 'Size: small to large'], ['price', 'Price: low to high'], ['name', 'Name: A–Z']]
+        .map(function (o) { return '<option value="' + o[0] + '"' + (sortBy === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
+      '</select></label></div>';
+    main += list.length ? '<div class="bhk-grid">' + list.slice(0, shown).map(card).join('') + '</div>' :
+      '<div class="bhk-empty">No products match these filters. <button type="button" class="bhk-rf__clear" data-act="clear">Clear all</button></div>';
+
+    if (list.length > 0) {
+      if (list.length > shown) {
+        main += '<div class="bhk-sentinel" data-bhk-sentinel><span class="bhk-sentinel__loading">Loading more products...</span></div>';
+      } else {
+        main += '<div class="bhk-end-of-list"><span class="bhk-end-of-list__txt">You have reached the end of the list.</span><button type="button" class="bhk-back-to-top">Back to Top</button></div>';
+      }
+    }
+
+    root.querySelector('.bhk-rf__side').innerHTML = renderSide() +
+      '<div class="bhk-sheetfoot"><button type="button" data-act="close">Show ' + list.length + ' products</button></div>';
+    root.querySelector('.bhk-rf__main').innerHTML = main;
+    updateInfiniteScrollUI();
+    if (typeof updateStickySidebar === 'function') {
+      requestAnimationFrame(updateStickySidebar);
+    }
+
+    // Trigger currency switcher if store currency switcher is on page
+    try {
+      var curLink = document.querySelector('a.navUser-action--currencySelector');
+      if (curLink) {
+        var code = curLink.textContent.trim().toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
+        if (code && typeof window.convertTo === 'function') {
+          window.convertTo(code);
+        }
+      }
+    } catch (e) {}
+  }
+
+  /* ----- Infinite Scroll ----- */
+  function loadMoreProducts() {
+    if (shown >= currentFilteredList.length) return;
+    var nextBatch = currentFilteredList.slice(shown, shown + CONFIG.PAGE_SIZE);
+    shown += CONFIG.PAGE_SIZE;
+    var grid = root ? root.querySelector('.bhk-grid') : null;
+    if (grid && nextBatch.length) {
+      var temp = document.createElement('div');
+      temp.innerHTML = nextBatch.map(card).join('');
+      while (temp.firstChild) {
+        grid.appendChild(temp.firstChild);
+      }
+    }
+    updateInfiniteScrollUI();
+  }
+
+  function updateInfiniteScrollUI() {
+    if (!root) return;
+    var mainEl = root.querySelector('.bhk-rf__main');
+    if (!mainEl) return;
+    var sentinel = mainEl.querySelector('[data-bhk-sentinel]');
+    var endEl = mainEl.querySelector('.bhk-end-of-list');
+
+    if (shown >= currentFilteredList.length) {
+      if (sentinel) sentinel.remove();
+      if (!endEl && currentFilteredList.length > 0) {
+        var endDiv = document.createElement('div');
+        endDiv.className = 'bhk-end-of-list';
+        endDiv.innerHTML = '<span class="bhk-end-of-list__txt">You have reached the end of the list.</span>' +
+          '<button type="button" class="bhk-back-to-top">Back to Top</button>';
+        mainEl.appendChild(endDiv);
+      }
+      if (scrollObserver) {
+        scrollObserver.disconnect();
+        scrollObserver = null;
+      }
+    } else {
+      if (endEl) endEl.remove();
+      if (!sentinel) {
+        sentinel = document.createElement('div');
+        sentinel.className = 'bhk-sentinel';
+        sentinel.setAttribute('data-bhk-sentinel', '1');
+        sentinel.innerHTML = '<span class="bhk-sentinel__loading">Loading more products...</span>';
+        mainEl.appendChild(sentinel);
+      }
+      observeSentinel(sentinel);
+    }
+  }
+
+  function observeSentinel(sentinel) {
+    if (!sentinel) return;
+    if (scrollObserver) scrollObserver.disconnect();
+    if ('IntersectionObserver' in window) {
+      scrollObserver = new IntersectionObserver(function (entries) {
+        if (entries[0] && entries[0].isIntersecting) {
+          loadMoreProducts();
+        }
+      }, { rootMargin: '600px 0px' });
+      scrollObserver.observe(sentinel);
+    } else {
+      var onScroll = function () {
+        var rect = sentinel.getBoundingClientRect();
+        if (rect.top <= window.innerHeight + 600) {
+          window.removeEventListener('scroll', onScroll);
+          loadMoreProducts();
+        }
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+  }
+
+  /* ----- Quick View Handler ----- */
+  function handleQuickView(btn) {
+    var pid = btn.getAttribute('data-product-id');
+    if (!pid) return;
+
+    var utils = window.stencilUtils || (window.stencilBootstrap && window.stencilBootstrap.utils);
+    var modal = (window.defaultModal && window.defaultModal()) || (window.basicModal && window.basicModal());
+
+    if (utils && utils.api && utils.api.product && modal) {
+      modal.open();
+      utils.api.product.getById(pid, { template: 'products/quick-view' }, function (err, response) {
+        if (err) return;
+        modal.updateContent(response);
+      });
+      return;
+    }
+
+    if (window.$ && window.$.fn && window.$.fn.quickviewModal) {
+      var modalEl = window.$('#modal') || window.$('.modal');
+      if (modalEl && modalEl.length) {
+        if (utils && utils.api && utils.api.product) {
+          utils.api.product.getById(pid, { template: 'products/quick-view' }, function (err, response) {
+            if (err) return;
+            modalEl.html(response);
+            if (typeof modalEl.modal === 'function') modalEl.modal('show');
+          });
+          return;
+        }
+      }
+    }
+
+    var listing = document.querySelector(CONFIG.LISTING);
+    if (listing) {
+      var dummy = document.createElement('a');
+      dummy.className = 'quickview';
+      dummy.setAttribute('data-product-id', pid);
+      dummy.style.display = 'none';
+      listing.appendChild(dummy);
+      if (window.$) window.$(dummy).trigger('click'); else dummy.click();
+      setTimeout(function () { dummy.remove(); }, 500);
+    }
+  }
+
+  /* ----- Cart and Stepper Actions ----- */
+  function handleStepper(btn) {
+    var stepper = btn.closest('[data-card-stepper]');
+    var input = stepper && stepper.querySelector('[data-card-qty]');
+    if (!input) return;
+    var step = btn.getAttribute('data-step');
+    var cur = parseInt(input.value, 10) || 1;
+    if (step === 'up') input.value = cur + 1;
+    else if (step === 'down' && cur > 1) input.value = cur - 1;
+  }
+
+  function handleAddToCart(btn) {
+    var cardEl = btn.closest('.bcard');
+    var qtyInput = cardEl && cardEl.querySelector('[data-card-qty]');
+    var qty = Math.max(1, parseInt(qtyInput ? qtyInput.value : '1', 10) || 1);
+    var pid = parseInt(btn.getAttribute('data-product-id'), 10);
+    if (!pid) return;
+
+    btn.disabled = true;
+    btn.setAttribute('data-busy', '1');
+    btn.textContent = 'Adding...';
+
+    fetch('/api/storefront/carts', { credentials: 'include' })
+      .then(function (r) { return r.json(); })
+      .then(function (carts) {
+        var cartId = carts && carts.length ? carts[0].id : null;
+        var url = cartId ? ('/api/storefront/carts/' + cartId + '/items') : '/api/storefront/carts';
+        return fetch(url, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lineItems: [{ productId: pid, quantity: qty }] })
+        });
+      })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Add to cart failed');
+        btn.textContent = 'Added \u2713';
+        setTimeout(function () {
+          btn.removeAttribute('data-busy');
+          btn.textContent = '';
+          btn.disabled = false;
+        }, 1200);
+        if (typeof window.refreshJnsCartUI === 'function') {
+          Promise.resolve(window.refreshJnsCartUI()).then(function () {
+            if (typeof window.openJnsSideCart === 'function') window.openJnsSideCart();
+          });
+        } else if (typeof window.openJnsSideCart === 'function') {
+          window.openJnsSideCart();
+        }
+      })
+      .catch(function () {
+        btn.textContent = 'Error';
+        setTimeout(function () {
+          btn.removeAttribute('data-busy');
+          btn.textContent = '';
+          btn.disabled = false;
+        }, 1500);
+      });
+  }
+
+  /* ----- Events ----- */
+  function onClick(e) {
+    var qvBtn = e.target.closest('.quickview');
+    if (qvBtn && root.contains(qvBtn)) {
+      e.preventDefault();
+      handleQuickView(qvBtn);
+      return;
+    }
+
+    var stepBtn = e.target.closest('[data-step]');
+    if (stepBtn && root.contains(stepBtn)) {
+      e.preventDefault();
+      handleStepper(stepBtn);
+      return;
+    }
+
+    var addBtn = e.target.closest('.bcard-add');
+    if (addBtn && root.contains(addBtn)) {
+      e.preventDefault();
+      handleAddToCart(addBtn);
+      return;
+    }
+
+    var backToTopBtn = e.target.closest('.bhk-back-to-top');
+    if (backToTopBtn && root.contains(backToTopBtn)) {
+      e.preventDefault();
+      window.scrollTo({ top: root.offsetTop - 80, behavior: 'smooth' });
+      return;
+    }
+
+    var el = e.target.closest('[data-act]');
+    if (!el || !root.contains(el) || el.tagName === 'SELECT') return;
+    var act = el.getAttribute('data-act'), g = el.getAttribute('data-g'), v = el.getAttribute('data-v');
+    if (act === 'pick') {
+      var sel = state[g], i = sel.indexOf(v);
+      if (i >= 0) sel.splice(i, 1); else sel.push(v);
+      shown = CONFIG.PAGE_SIZE; writeState(); render();
+    } else if (act === 'clear') {
+      GROUPS.forEach(function (x) { state[x.key] = []; });
+      shown = CONFIG.PAGE_SIZE; writeState(); render();
+    } else if (act === 'toggle') {
+      var grp = GROUPS.filter(function (x) { return x.key === g; })[0];
+      var cur = closed[g] !== undefined ? closed[g] : (!grp.open && !state[g].length);
+      closed[g] = !cur; render();
+    } else if (act === 'more') {
+      expanded[g] = true; render();
+    } else if (act === 'less') {
+      expanded[g] = false; render();
+    } else if (act === 'loadmore') {
+      loadMoreProducts();
+    } else if (act === 'open') {
+      root.classList.add('is-open');
+    } else if (act === 'close') {
+      root.classList.remove('is-open');
+    }
+  }
+
+  function onChange(e) {
+    if (e.target.getAttribute('data-act') === 'sort') { sortBy = e.target.value; writeState(); render(); }
+  }
+
+  /* ----- Start ----- */
+  function start() {
+    if (CONFIG.TEST_ONLY && !/[?&]rftest=1/.test(location.search)) return;
+    var listing = document.querySelector(CONFIG.LISTING);
+    if (!listing) return;
+    recordOriginalOrder(listing);
+    var nextLink = document.querySelector('.pagination-item--next a, .pagination-next a, [data-pagination-next]');
+    if (nextLink && nextLink.href) {
+      fetchSubsequentPages(nextLink.href);
+    }
+    getJSON(CONFIG.DATA_URL + 'index.json').then(function (idx) {
+      var id = idx.c[normPath(location.pathname)];
+      if (!id) return;
+      var landingCount = idx.l && idx.l[id];
+      isLanding = !!landingCount;
+      if (isLanding && !/[?&](list|stone|size|shape|color|gemstone|material)=/.test(location.search)) {
+        var link = document.createElement('a');
+        link.className = 'bhk-listlink';
+        link.href = location.pathname + '?list=1' + (/[?&]rftest=1/.test(location.search) ? '&rftest=1' : '');
+        link.innerHTML = ICON_FILTER + 'Browse all ' + Number(landingCount).toLocaleString('en-US') + ' products with filters' + ICON_ARROW;
+        listing.parentNode.insertBefore(link, listing);
+        listing.style.display = 'none';
+        return;
+      }
+      return getJSON(CONFIG.DATA_URL + 'c/' + id + '.json').then(function (rows) {
+        if (!rows || rows.length < CONFIG.MIN_PRODUCTS) return;
+        items = rows;
+        readState();
+        root = document.createElement('div');
+        root.className = 'bhk-rf';
+        root.innerHTML = '<aside class="bhk-rf__side" aria-label="Refine products"></aside><div class="bhk-rf__main"></div>';
+        listing.parentNode.insertBefore(root, listing);
+        CONFIG.HIDE.forEach(function (s) {
+          document.querySelectorAll(s).forEach(function (el) { el.style.display = 'none'; });
+        });
+        root.addEventListener('click', onClick);
+        root.addEventListener('change', onChange);
+        window.addEventListener('popstate', function () { readState(); render(); });
+        render();
+
+        // JS fallback for sticky sidebar (bypasses parent overflow:hidden issues)
+        var side = root.querySelector('.bhk-rf__side');
+        updateStickySidebar = function () {
+          if (!side || !root) return;
+          if (window.innerWidth <= 900) {
+            side.style.transform = '';
+            side.style.maxHeight = '';
+            return;
+          }
+          var rootRect = root.getBoundingClientRect();
+          var header = document.querySelector('.header') || document.querySelector('header');
+          var headerBottom = header ? header.getBoundingClientRect().bottom : 0;
+          var offset = Math.max(160, headerBottom + 16);
+
+          if (rootRect.top < offset) {
+            var maxPush = Math.max(0, rootRect.height - side.offsetHeight);
+            var push = Math.min(offset - rootRect.top, maxPush);
+            side.style.transform = 'translateY(' + push + 'px)';
+          } else {
+            side.style.transform = '';
+          }
+
+          var sideRect = side.getBoundingClientRect();
+          var avail = Math.max(260, window.innerHeight - sideRect.top - 20);
+          side.style.maxHeight = avail + 'px';
+        };
+
+        window.addEventListener('scroll', updateStickySidebar, { passive: true });
+        window.addEventListener('resize', updateStickySidebar, { passive: true });
+        updateStickySidebar();
+      });
+    }).catch(function (err) {
+      if (window.console) console.warn('Refine bar not loaded:', err);
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>

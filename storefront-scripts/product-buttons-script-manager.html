@@ -1,0 +1,305 @@
+<script>
+(function () {
+  'use strict';
+
+  var style = document.createElement('style');
+  style.textContent = `
+.bhk-pb{--navy:#213A73;--navy-d:#16264D;--navy-t:#EAF0FA;--gold:#D6A650;--gold-d:#8A6420;--gold-t:#FBF3E3;--line:#E2E7F1;--muted:#5A6378;--text:#1B2233;--green:#1E7A57;--green-t:#E6F3EE;
+  font-family:'Plus Jakarta Sans','Helvetica Neue',Arial,sans-serif;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:24px 0;position:relative}
+.bhk-pb *{box-sizing:border-box}
+.bhk-pb__title{font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold-d);margin:0 0 12px}
+.bhk-pb__grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;position:relative}
+.bhk-pb__item{position:relative}
+.bhk-pb__btn{display:flex;align-items:center;gap:10px;min-height:60px;width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid #C9D2E4;background:#fff;color:var(--navy-d);text-decoration:none;line-height:1.2;cursor:pointer;text-align:left;font:inherit;transition:border-color .15s,background-color .15s}
+.bhk-pb__btn:hover{border-color:var(--navy);background:var(--navy-t)}
+.bhk-pb__btn.is-active{border-color:var(--navy);background:#fff;box-shadow:0 0 0 3px rgba(33,58,115,0.14)}
+.bhk-pb__btn--back{background:var(--navy);border-color:var(--navy);color:#fff}
+.bhk-pb__btn--back:hover{background:var(--navy-d);border-color:var(--navy-d)}
+.bhk-pb__ic{width:30px;height:30px;border-radius:15px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--navy-t);color:var(--navy)}
+.bhk-pb__btn--back .bhk-pb__ic{background:rgba(255,255,255,.18);color:#fff}
+.bhk-pb__txt{display:flex;flex-direction:column;min-width:0;flex:1}
+.bhk-pb__k{font-size:13px;font-weight:800;color:var(--navy-d);line-height:1.2}
+.bhk-pb__btn--back .bhk-pb__k{font-size:12px;font-weight:700;color:#C9D3EA}
+.bhk-pb__v{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.bhk-pb__btn--back .bhk-pb__v{font-size:14.5px;font-weight:800;color:#fff}
+.bhk-pb__chev{margin-left:auto;color:#8B96AD;display:flex;align-items:center;transition:transform .2s ease;flex-shrink:0}
+.bhk-pb__btn.is-active .bhk-pb__chev{transform:rotate(180deg);color:var(--navy)}
+
+/* Popover Dropdown (Opens Upward) */
+.bhk-pb__popover{display:none;position:absolute;bottom:calc(100% + 8px);top:auto;left:0;min-width:270px;background:#fff;border:1px solid #C9D2E4;border-radius:14px;box-shadow:0 -12px 35px rgba(22,38,77,0.18);padding:14px;z-index:9999}
+.bhk-pb__item:nth-last-child(-n+2) .bhk-pb__popover{left:auto;right:0}
+.bhk-pb__item.is-open .bhk-pb__popover{display:block}
+.bhk-pb__list{display:flex;flex-direction:column;gap:4px;max-height:340px;overflow-y:auto;padding-right:4px}
+.bhk-pb__opt{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--text);user-select:none;transition:background .1s}
+.bhk-pb__opt:hover{background:var(--navy-t)}
+.bhk-pb__cb{width:18px;height:18px;border:1.5px solid #9AA5BD;border-radius:5px;background:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .1s}
+.bhk-pb__opt.is-checked .bhk-pb__cb{background:var(--navy);border-color:var(--navy)}
+.bhk-pb__cb svg{display:none}
+.bhk-pb__opt.is-checked .bhk-pb__cb svg{display:block}
+.bhk-pb__swatch{width:18px;height:18px;border-radius:9px;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.bhk-pb__badge{background:var(--green-t);color:var(--green);font-size:10px;font-weight:800;padding:2px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.3px;margin-left:6px;display:inline-block}
+.bhk-pb__count{margin-left:auto;font-size:12px;font-weight:700;color:var(--muted)}
+.bhk-pb__foot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px;margin-top:10px}
+.bhk-pb__clear{background:none;border:0;color:var(--gold-d);font-weight:700;font-size:13px;cursor:pointer;padding:4px 6px;text-decoration:underline}
+.bhk-pb__clear:hover{color:var(--navy-d)}
+.bhk-pb__apply{background:var(--navy);color:#fff;border:0;border-radius:9px;height:38px;padding:0 16px;font-weight:800;font-size:13.5px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;cursor:pointer;transition:background .15s}
+.bhk-pb__apply:hover{background:var(--navy-d)}
+
+@media (max-width:1100px){
+  .bhk-pb__grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .bhk-pb__popover{left:0;right:auto}
+  .bhk-pb__item:nth-child(3n) .bhk-pb__popover{left:auto;right:0}
+}
+@media (max-width:700px){
+  .bhk-pb{padding:14px}
+  .bhk-pb__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bhk-pb__btn--back{grid-column:1 / -1}
+  .bhk-pb__btn{padding:10px 12px;gap:8px}
+  .bhk-pb__v{white-space:normal}
+  .bhk-pb__popover{position:fixed;top:auto;bottom:0;left:0;right:0;width:100%;border-radius:18px 18px 0 0;padding:18px 18px 24px;box-shadow:0 -10px 30px rgba(0,0,0,0.25)}
+}
+`;
+  document.head.appendChild(style);
+
+  /* ===== Settings ===== */
+  var CONFIG = {
+    DATA_URL: 'https://danacentre25-droid.github.io/b4l-bead-filter/',
+    PRODUCT_ID: 'input[name="product_id"]',
+    PLACE_BEFORE: ['.productView-description', '#tab-related', '.productView-reviews'],
+    PLACE_AFTER: '.productView',
+    TITLE: 'Find more like this',
+    TEST_ONLY: false
+  };
+
+  var FINDS = [
+    { key: 'stone', label: 'Find Stone', col: 14 },
+    { key: 'color', label: 'Find Color', col: 7 },
+    { key: 'shape', label: 'Find Shape', col: 6 },
+    { key: 'size', label: 'Find Size', col: 5 },
+    { key: 'gemstone', label: 'Find Natural', col: 8 },
+    { key: 'material', label: 'Find Material', col: 9 }
+  ];
+
+  var SWATCH = {
+    Red: '#B3322C', Pink: '#E3A6AE', Orange: '#D9772B', Yellow: '#E2BE3E', Green: '#4E8A5E', Blue: '#2F5DA8',
+    Purple: '#7B5EA7', Brown: '#8A5A2B', Black: '#222222', White: '#F4F2EC', Grey: '#9AA0A6', Clear: '#FFFFFF',
+    Turquoise: '#3BB4B4', Amethyst: '#926AA6', Crystal: '#E8F1F5',
+    Multicolor: 'conic-gradient(#B3322C,#E2BE3E,#4E8A5E,#2F5DA8,#7B5EA7,#B3322C)',
+    'Multi Color': 'conic-gradient(#B3322C,#E2BE3E,#4E8A5E,#2F5DA8,#7B5EA7,#B3322C)',
+    Mix: 'conic-gradient(#B3322C,#E2BE3E,#4E8A5E,#2F5DA8,#7B5EA7,#B3322C)'
+  };
+
+  var ICON_BACK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>';
+  var ICON_FIND = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>';
+  var ICON_CHEV = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  var ICON_CHECK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4 4 10-10"/></svg>';
+  var ICON_ARROW = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function getJSON(url) {
+    return fetch(url, { cache: 'no-cache' }).then(function (r) {
+      if (!r.ok) throw new Error(r.status + ' ' + url);
+      return r.json();
+    });
+  }
+  function normPath(p) {
+    return ('/' + String(p || '').trim()
+      .replace(/^https?:\/\/[^/]+/i, '')
+      .replace(/[?#].*$/, '')
+      .replace(/^\/+|\/+$/g, '')).toLowerCase();
+  }
+  function lastList() {
+    try {
+      return JSON.parse(sessionStorage.getItem('b4lList') || sessionStorage.getItem('bhkList') || 'null');
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function render(p, targetCatUrl, catProducts) {
+    var back = lastList();
+    var grid = document.createElement('div');
+    grid.className = 'bhk-pb__grid';
+
+    if (back && back.path && back.path !== location.pathname) {
+      var itemBack = document.createElement('div');
+      itemBack.className = 'bhk-pb__item';
+      itemBack.innerHTML = '<a href="' + esc(back.path + (back.search || '')) + '" class="bhk-pb__btn bhk-pb__btn--back">' +
+        '<span class="bhk-pb__ic">' + ICON_BACK + '</span>' +
+        '<div class="bhk-pb__txt"><span class="bhk-pb__k">Back to Filtered List</span>' +
+        '<span class="bhk-pb__v">' + esc(back.label || 'Last filter') + '</span></div>' +
+        '</a>';
+      grid.appendChild(itemBack);
+    }
+
+    FINDS.forEach(function (f) {
+      var curVal = p[f.col];
+      var counts = {};
+      catProducts.forEach(function (row) {
+        var v = row[f.col];
+        if (v) counts[v] = (counts[v] || 0) + 1;
+      });
+
+      var sortedVals = Object.keys(counts).sort(function (a, b) {
+        if (a === curVal) return -1;
+        if (b === curVal) return 1;
+        return counts[b] - counts[a];
+      });
+
+      var selected = new Set();
+      if (curVal && counts[curVal]) selected.add(curVal);
+
+      var item = document.createElement('div');
+      item.className = 'bhk-pb__item';
+      item.setAttribute('data-key', f.key);
+
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'bhk-pb__btn';
+      btn.innerHTML = '<span class="bhk-pb__ic">' + ICON_FIND + '</span>' +
+        '<div class="bhk-pb__txt"><span class="bhk-pb__k">' + esc(f.label) + '</span>' +
+        '<span class="bhk-pb__v">' + esc(curVal || 'Any') + '</span></div>' +
+        '<span class="bhk-pb__chev">' + ICON_CHEV + '</span>';
+
+      var popover = document.createElement('div');
+      popover.className = 'bhk-pb__popover';
+
+      function renderPopover() {
+        var listHtml = '<div class="bhk-pb__list">';
+        sortedVals.forEach(function (val) {
+          var isChecked = selected.has(val);
+          var isCurrent = val === curVal;
+          var swatchHtml = (f.key === 'color' && SWATCH[val]) ? '<span class="bhk-pb__swatch" style="background:' + SWATCH[val] + '"></span>' : '';
+          var badgeHtml = isCurrent ? '<span class="bhk-pb__badge">This item</span>' : '';
+
+          listHtml += '<div class="bhk-pb__opt' + (isChecked ? ' is-checked' : '') + '" data-val="' + esc(val) + '">' +
+            '<span class="bhk-pb__cb">' + ICON_CHECK + '</span>' +
+            swatchHtml +
+            '<span>' + esc(val) + '</span>' +
+            badgeHtml +
+            '<span class="bhk-pb__count">' + counts[val] + '</span>' +
+            '</div>';
+        });
+        listHtml += '</div>';
+
+        var applyUrl = targetCatUrl + (selected.size ? '?' + f.key + '=' + encodeURIComponent(Array.from(selected).join(',')) : '');
+        var totalCount = 0;
+        selected.forEach(function (v) { totalCount += (counts[v] || 0); });
+
+        var footHtml = '<div class="bhk-pb__foot">' +
+          '<button type="button" class="bhk-pb__clear">Reset</button>' +
+          '<a href="' + esc(applyUrl) + '" class="bhk-pb__apply">Apply (' + (totalCount || catProducts.length) + ')' + ICON_ARROW + '</a>' +
+          '</div>';
+
+        popover.innerHTML = listHtml + footHtml;
+
+        popover.querySelectorAll('.bhk-pb__opt').forEach(function (opt) {
+          opt.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var v = opt.getAttribute('data-val');
+            if (selected.has(v)) selected.delete(v); else selected.add(v);
+            renderPopover();
+          });
+        });
+
+        var clearBtn = popover.querySelector('.bhk-pb__clear');
+        if (clearBtn) {
+          clearBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            selected.clear();
+            if (curVal && counts[curVal]) selected.add(curVal);
+            renderPopover();
+          });
+        }
+      }
+
+      renderPopover();
+
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var wasOpen = item.classList.contains('is-open');
+        document.querySelectorAll('.bhk-pb__item.is-open').forEach(function (el) {
+          el.classList.remove('is-open');
+          el.querySelector('.bhk-pb__btn').classList.remove('is-active');
+        });
+        if (!wasOpen) {
+          item.classList.add('is-open');
+          btn.classList.add('is-active');
+        }
+      });
+
+      item.appendChild(btn);
+      item.appendChild(popover);
+      grid.appendChild(item);
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.bhk-pb__popover') && !e.target.closest('.bhk-pb__btn')) {
+        document.querySelectorAll('.bhk-pb__item.is-open').forEach(function (el) {
+          el.classList.remove('is-open');
+          el.querySelector('.bhk-pb__btn').classList.remove('is-active');
+        });
+      }
+    });
+
+    var wrap = document.createElement('div');
+    wrap.className = 'bhk-pb';
+    wrap.innerHTML = '<div class="bhk-pb__title">' + esc(CONFIG.TITLE) + '</div>';
+    wrap.appendChild(grid);
+
+    var target = null;
+    for (var i = 0; i < CONFIG.PLACE_BEFORE.length; i++) {
+      target = document.querySelector(CONFIG.PLACE_BEFORE[i]);
+      if (target) {
+        target.parentNode.insertBefore(wrap, target);
+        return;
+      }
+    }
+    target = document.querySelector(CONFIG.PLACE_AFTER);
+    if (target) target.parentNode.insertBefore(wrap, target.nextSibling);
+  }
+
+  function init() {
+    if (CONFIG.TEST_ONLY && !/[?&]rftest=1/.test(location.search)) return;
+
+    var input = document.querySelector(CONFIG.PRODUCT_ID);
+    var pid = input ? parseInt(input.value, 10) : null;
+    if (!pid) return;
+
+    var b = Math.floor(pid / 1000);
+    Promise.all([
+      getJSON(CONFIG.DATA_URL + 'index.json'),
+      getJSON(CONFIG.DATA_URL + 'p/' + b + '.json')
+    ]).then(function (res) {
+      var idx = res[0], bucket = res[1];
+      var cats = bucket && bucket[pid];
+      if (!cats) return;
+
+      var targetCid = cats[1] || cats[0];
+      var targetCatUrl = (idx.u && idx.u[targetCid]) || '/';
+
+      return getJSON(CONFIG.DATA_URL + 'c/' + targetCid + '.json').then(function (products) {
+        if (!products) return;
+        var p = null;
+        for (var i = 0; i < products.length; i++) {
+          if (products[i][0] === pid) { p = products[i]; break; }
+        }
+        if (!p) return;
+        render(p, targetCatUrl, products);
+      });
+    }).catch(function (err) {
+      console.warn('Product buttons init failed:', err);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
